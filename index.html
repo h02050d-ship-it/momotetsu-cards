@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-<!-- build:v2 -->
+<!-- build:v3 -->
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#db2777">
@@ -149,6 +149,11 @@ footer{text-align:center;font-size:12px;color:var(--sub);margin-top:24px}
 .toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom));transform:translateX(-50%);background:#111827;color:#fff;
   padding:10px 16px;border-radius:999px;font-size:14px;z-index:60;opacity:0;pointer-events:none;transition:opacity .2s;max-width:90vw;text-align:center}
 .toast.show{opacity:.92}
+.card,#typeRows tr,.pick{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+.dragging{position:relative;z-index:20;opacity:.92;box-shadow:0 10px 24px rgba(0,0,0,.2);transition:none!important}
+tr.dragging{background:#fff;outline:2px solid var(--theme);outline-offset:-2px}
+body.sorting,body.sorting *{-webkit-user-select:none;user-select:none;touch-action:none}
+.sheet-hint{margin:8px 16px 0;font-size:12.5px;color:var(--sub)}
 @media (min-width:600px){ .hd h1{font-size:19px} .c-name .nm{font-size:17px} }
 </style>
 </head>
@@ -163,7 +168,7 @@ footer{text-align:center;font-size:12px;color:var(--sub);margin-top:24px}
 <div class="wrap">
   <div id="hand"></div>
   <button type="button" class="add-main" id="openAdd">＋ カードを追加</button>
-  <p class="legend">数字は「使った回数／止める回数」。↺＝回数を0に戻す（期間延長カード・周遊駅のとき）、✕＝捨てた/消えた。</p>
+  <p class="legend">数字は「使った回数／止める回数」。カードは<b>長押しで並び替え</b>できます。↺＝回数を0に戻す（期間延長カード・周遊駅のとき）、✕＝捨てた/消えた。</p>
 
   <details class="sec" id="secTypes">
     <summary>🗂 カード種類の管理</summary>
@@ -173,6 +178,7 @@ footer{text-align:center;font-size:12px;color:var(--sub);margin-top:24px}
         <thead><tr><th>名前</th><th>🎲</th><th>止める/最大</th><th></th></tr></thead>
         <tbody id="typeRows"></tbody>
       </table>
+      <p class="hint">行を長押しすると並び替えできます（追加シートの並びにも反映）。</p>
       <form class="form" id="typeForm" autocomplete="off" novalidate>
         <h3 id="formTitle">種類を追加</h3>
         <label class="full">名前（必須）<input type="text" id="fName" maxlength="40" placeholder="例：新幹線周遊カード"></label>
@@ -252,6 +258,7 @@ footer{text-align:center;font-size:12px;color:var(--sub);margin-top:24px}
       <h2 id="sheetTitle">どのカードを追加する？</h2>
       <button type="button" class="btn btn-sub" id="closeAdd" aria-label="閉じる">✕</button>
     </div>
+    <p class="sheet-hint">タップで追加／長押しで並び替え</p>
     <div class="sheet-warn" id="sheetWarn" hidden></div>
     <div class="sheet-list" id="pickList"></div>
   </div>
@@ -454,7 +461,7 @@ footer{text-align:center;font-size:12px;color:var(--sub);margin-top:24px}
 
   function renderTypes() {
     var rows = S.types.map(function (t) {
-      return '<tr><td class="nm">' + esc(t.name) + (t.note ? '<small>' + esc(t.note) + '</small>' : '') + '</td>' +
+      return '<tr data-id="' + esc(t.id) + '"><td class="nm">' + esc(t.name) + (t.note ? '<small>' + esc(t.note) + '</small>' : '') + '</td>' +
         '<td class="c">' + (t.dice ? esc(t.dice) : '−') + '</td>' +
         '<td class="c">' + t.stop + ' / ' + (t.max ? t.max : '−') + '</td>' +
         '<td class="ops"><button type="button" class="btn btn-sub" data-act="editType" data-id="' + esc(t.id) + '">編集</button> ' +
@@ -490,6 +497,161 @@ footer{text-align:center;font-size:12px;color:var(--sub);margin-top:24px}
     if ($('addSheet').classList.contains('open')) renderPick();
   }
   function commit() { save(); renderAll(); }
+
+  // ---------- 長押しで並び替え（Pointer Events） ----------
+  var suppressClick = false, suppressTimer = null, dragActive = false;
+  document.addEventListener('click', function (e) {
+    if (!suppressClick) return;
+    suppressClick = false;
+    e.stopPropagation(); e.preventDefault();
+  }, true);
+  // 次の操作が始まったら、並び替え後のクリック抑止は解除（取りこぼし防止）
+  document.addEventListener('pointerdown', function () { if (!dragActive) suppressClick = false; }, true);
+  document.addEventListener('touchmove', function (e) { if (dragActive) e.preventDefault(); }, { passive: false });
+
+  function reorderById(arr, ids) {
+    var map = {}, out = [];
+    arr.forEach(function (x) { map[x.id] = x; });
+    ids.forEach(function (id) { if (map[id]) { out.push(map[id]); delete map[id]; } });
+    arr.forEach(function (x) { if (map[x.id]) out.push(x); });
+    return out;
+  }
+
+  function makeSortable(container, itemSel, getScroller, onDone) {
+    var st = null;
+    function items() {
+      return Array.prototype.filter.call(container.children, function (el) { return el.matches(itemSel); });
+    }
+    function nextItem(el) { var n = el.nextElementSibling; while (n && !n.matches(itemSel)) n = n.nextElementSibling; return n; }
+    function prevItem(el) { var n = el.previousElementSibling; while (n && !n.matches(itemSel)) n = n.previousElementSibling; return n; }
+    function reset() { if (st && st.timer) clearTimeout(st.timer); st = null; }
+    // 変形(transform)を除いた本来の位置（画面上のY）
+    function layoutTop(el) {
+      var ty = 0, tf = getComputedStyle(el).transform;
+      if (tf && tf !== 'none') { try { ty = new DOMMatrixReadOnly(tf).m42; } catch (e) { ty = 0; } }
+      return el.getBoundingClientRect().top - ty;
+    }
+    function flip(el, mutate) {
+      var before = layoutTop(el);
+      mutate();
+      var d = before - layoutTop(el);
+      if (!d) return;
+      el.style.transition = 'none';
+      el.style.transform = 'translateY(' + d + 'px)';
+      void el.offsetWidth;
+      el.style.transition = 'transform .15s ease';
+      el.style.transform = '';
+    }
+    function apply() {
+      var item = st.item;
+      var want = st.y - st.grab;
+      var center = want + item.offsetHeight / 2;
+      for (var guard = 0; guard < 60; guard++) {
+        var next = nextItem(item), prev = prevItem(item);
+        if (next && center > layoutTop(next) + next.offsetHeight / 2) {
+          flip(next, function () { container.insertBefore(next, item); });
+          continue;
+        }
+        if (prev && center < layoutTop(prev) + prev.offsetHeight / 2) {
+          flip(prev, function () { container.insertBefore(prev, item.nextSibling); });
+          continue;
+        }
+        break;
+      }
+      st.dy = want - layoutTop(item);
+      item.style.transform = 'translateY(' + st.dy + 'px) scale(1.02)';
+    }
+    function tick() {
+      if (!st || !st.active) return;
+      var sc = getScroller(), top, bottom, speed = 0;
+      if (sc === window) {
+        var hd = document.querySelector('header');
+        top = hd ? hd.getBoundingClientRect().bottom : 0; bottom = window.innerHeight;
+      } else { var r = sc.getBoundingClientRect(); top = r.top; bottom = r.bottom; }
+      if (st.y < top + 40) speed = -6; else if (st.y > bottom - 40) speed = 6;
+      if (speed) {
+        if (sc === window) window.scrollBy(0, speed); else sc.scrollTop += speed;
+        apply();
+      }
+      st.raf = requestAnimationFrame(tick);
+    }
+    function activate() {
+      if (!st) return;
+      st.timer = null; st.active = true; dragActive = true;
+      try { container.setPointerCapture(st.pid); } catch (e) { /* 無視 */ }
+      st.grab = st.y - layoutTop(st.item);
+      st.dy = 0;
+      st.before = items().map(function (el) { return el.getAttribute('data-id'); }).join(',');
+      st.item.classList.add('dragging');
+      document.body.classList.add('sorting');
+      if (navigator.vibrate) { try { navigator.vibrate(20); } catch (e) { /* 無視 */ } }
+      apply();
+      st.raf = requestAnimationFrame(tick);
+    }
+    function finish() {
+      var s0 = st; st = null; dragActive = false;
+      cancelAnimationFrame(s0.raf);
+      try { container.releasePointerCapture(s0.pid); } catch (e) { /* 無視 */ }
+      document.body.classList.remove('sorting');
+      s0.item.classList.remove('dragging');
+      items().forEach(function (el) { el.style.transform = ''; el.style.transition = ''; });
+      suppressClick = true;
+      clearTimeout(suppressTimer);
+      suppressTimer = setTimeout(function () { suppressClick = false; }, 500);
+      var ids = items().map(function (el) { return el.getAttribute('data-id'); });
+      if (ids.join(',') === s0.before) return;
+      onDone(ids, s0.item.getAttribute('data-id'));
+    }
+    container.addEventListener('pointerdown', function (e) {
+      if (st || dragActive) return;
+      if (e.pointerType === 'mouse' && e.button !== 0) return;
+      var item = e.target.closest(itemSel);
+      if (!item || item.parentNode !== container) return;
+      var b = e.target.closest('button,input,textarea,select,a');
+      if (b && b !== item) return; // 行の中のボタンからは開始しない
+      st = { pid: e.pointerId, item: item, x0: e.clientX, y0: e.clientY, y: e.clientY, active: false, timer: null };
+      st.timer = setTimeout(activate, 400);
+    });
+    container.addEventListener('contextmenu', function (e) { if (st) e.preventDefault(); });
+    window.addEventListener('pointermove', function (e) {
+      if (!st || e.pointerId !== st.pid) return;
+      st.y = e.clientY;
+      if (!st.active) {
+        if (Math.abs(e.clientX - st.x0) > 8 || Math.abs(e.clientY - st.y0) > 8) reset();
+        return;
+      }
+      e.preventDefault();
+      apply();
+    }, { passive: false });
+    window.addEventListener('pointerup', function (e) {
+      if (!st || e.pointerId !== st.pid) return;
+      if (st.active) finish(); else reset();
+    });
+    window.addEventListener('pointercancel', function (e) {
+      if (!st || e.pointerId !== st.pid) return;
+      if (st.active) finish(); else reset();
+    });
+  }
+
+  function idsOf(arr) { return arr.map(function (x) { return x.id; }).join(','); }
+  makeSortable($('hand'), '.card', function () { return window; }, function (ids, movedId) {
+    var next = reorderById(S.hand, ids);
+    if (idsOf(next) === idsOf(S.hand)) { renderAll(); return; }
+    S.hand = next;
+    var i = findHand(movedId);
+    addLog((i >= 0 ? shortName(typeOrFallback(S.hand[i].typeId).name) : 'カード') + ' を並び替え');
+    commit();
+  });
+  function typesSorted(ids, movedId) {
+    var next = reorderById(S.types, ids);
+    if (idsOf(next) === idsOf(S.types)) { renderAll(); return; }
+    S.types = next;
+    var t = typeOf(movedId);
+    addLog('種類「' + (t ? shortName(t.name) : '?') + '」を並び替え');
+    commit();
+  }
+  makeSortable($('typeRows'), 'tr[data-id]', function () { return window; }, typesSorted);
+  makeSortable($('pickList'), '.pick', function () { return $('pickList'); }, typesSorted);
 
   // ---------- 手持ちカード操作 ----------
   function findHand(id) {
