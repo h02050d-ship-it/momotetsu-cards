@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<!-- build:v1 -->
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#db2777">
+<meta name="apple-mobile-web-app-title" content="桃鉄カード">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<title>桃鉄 周遊カードカウンター</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%23db2777'/><text x='51' y='46.5' font-size='68' text-anchor='middle' dominant-baseline='central' fill='%23ffffff' font-family='sans-serif' font-weight='bold'>桃</text></svg>">
+<link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%23db2777'/><text x='51' y='46.5' font-size='68' text-anchor='middle' dominant-baseline='central' fill='%23ffffff' font-family='sans-serif' font-weight='bold'>桃</text></svg>">
+<style>
+:root{
+  --theme:#db2777; --theme-d:#be185d; --theme-l:#fce7f3;
+  --bg:#fdf6f9; --card:#ffffff; --text:#1f2937; --sub:#6b7280; --line:#e5e7eb;
+  --green:#16a34a; --green-l:#f0fdf4;
+  --yellow:#d97706; --yellow-l:#fffbeb; --yellow-b:#f59e0b;
+  --red:#dc2626; --red-l:#fef2f2;
+  color-scheme: light;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--text);
+  font-family:system-ui,-apple-system,"Hiragino Sans","Hiragino Kaku Gothic ProN","Yu Gothic UI","Meiryo",sans-serif;
+  font-size:16px;line-height:1.5;padding-bottom:env(safe-area-inset-bottom)}
+button,input,textarea,select{font:inherit;color:inherit}
+button{touch-action:manipulation;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.wrap{max-width:640px;margin:0 auto;padding:0 16px 40px}
+
+/* ヘッダー */
+header{position:sticky;top:0;z-index:10;background:rgba(255,255,255,.96);border-bottom:2px solid var(--theme-l);
+  padding:10px 16px;padding-top:calc(10px + env(safe-area-inset-top))}
+.hd{max-width:640px;margin:0 auto;display:flex;align-items:center;gap:10px}
+.hd h1{margin:0;font-size:18px;line-height:1.3;color:var(--theme-d);flex:1;min-width:0}
+.badge{flex:none;border-radius:999px;padding:6px 12px;font-weight:700;font-size:15px;
+  background:var(--theme-l);color:var(--theme-d);border:2px solid transparent;white-space:nowrap}
+.badge.warn{background:var(--yellow-l);color:#92400e;border-color:var(--yellow-b)}
+.badge.full{background:var(--red);color:#fff;border-color:var(--red)}
+
+/* 手持ちカード */
+#hand{display:flex;flex-direction:column;gap:14px;margin-top:16px}
+.empty{background:var(--card);border:2px dashed #f9a8d4;border-radius:16px;padding:24px 16px;text-align:center;color:var(--sub)}
+.empty b{color:var(--theme-d)}
+.card{background:var(--card);border-radius:18px;border:4px solid var(--green);padding:14px 14px 12px;
+  box-shadow:0 2px 8px rgba(0,0,0,.05)}
+.card.st-yellow{border-color:var(--yellow-b);background:linear-gradient(var(--yellow-l),#fff 60%)}
+.card.st-red{border-color:var(--red);background:linear-gradient(var(--red-l),#fff 60%)}
+.card.bump{animation:bump .25s ease}
+@keyframes bump{0%{transform:scale(1)}40%{transform:scale(.985)}100%{transform:scale(1)}}
+.c-top{display:flex;align-items:flex-start;gap:8px}
+.c-name{font-size:22px;font-weight:800;line-height:1.25;flex:1;min-width:0;word-break:break-all}
+.c-name .num{font-size:14px;color:var(--sub);font-weight:600;margin-left:4px}
+.c-dice{flex:none;font-size:17px;font-weight:700;background:#f3f4f6;border-radius:10px;padding:2px 8px;white-space:nowrap}
+.c-note{font-size:13px;color:var(--sub);margin-top:2px}
+.c-status{display:inline-block;font-size:13px;font-weight:700;border-radius:6px;padding:1px 8px;margin-top:6px;color:#fff;background:var(--green)}
+.st-yellow .c-status{background:var(--yellow)}
+.st-red .c-status{background:var(--red)}
+.c-mid{display:flex;align-items:center;gap:14px;margin-top:8px}
+.c-count{flex:none;text-align:center;min-width:92px}
+.c-count .lbl{font-size:13px;color:var(--sub);display:block}
+.c-count .big{font-size:52px;font-weight:900;line-height:1;color:var(--text)}
+.c-count .big small{font-size:18px;font-weight:700;margin-left:2px}
+.c-rest{flex:1;min-width:0;font-size:16px;line-height:1.6}
+.c-rest b{font-size:24px;font-weight:900}
+.c-rest .sure b{color:var(--green)}
+.st-yellow .c-rest .sure b{color:var(--yellow)}
+.c-rest .danger{color:var(--red);font-weight:800}
+.c-rest .most{color:var(--sub)}
+.dots{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0 2px}
+.dot{width:22px;height:22px;border-radius:50%;border:2px solid #9ca3af;background:#fff}
+.dot.risk{border-style:dashed;border-color:#f87171;background:#fff7f7}
+.dot.on{background:var(--theme);border-color:var(--theme);border-style:solid}
+.dot.on.risk{background:var(--red);border-color:var(--red)}
+.dot.over{background:#7f1d1d;border-color:#7f1d1d}
+.dots-legend{font-size:11.5px;color:var(--sub)}
+.maxnote{margin:8px 0 0;font-size:13px;color:var(--red);font-weight:700}
+.c-btns{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:12px}
+.btn{min-height:48px;border-radius:12px;border:2px solid var(--line);background:#fff;font-weight:700;font-size:15px;padding:6px 8px;
+  transition:transform .08s ease,background .15s}
+.btn:active{transform:scale(.93)}
+.btn-use{grid-column:1 / -1;min-height:72px;font-size:26px;font-weight:900;background:var(--theme);border-color:var(--theme);color:#fff;
+  box-shadow:0 4px 0 var(--theme-d)}
+.btn-use:active{transform:scale(.95) translateY(2px);box-shadow:0 2px 0 var(--theme-d)}
+.btn-danger{color:var(--red);border-color:#fecaca}
+.btn-primary{background:var(--theme);border-color:var(--theme);color:#fff}
+.btn-sub{background:#f9fafb}
+.add-main{display:block;width:100%;margin-top:16px;min-height:64px;font-size:20px;border-radius:16px;border:3px dashed var(--theme);
+  background:#fff;color:var(--theme-d);font-weight:900}
+.add-main:active{transform:scale(.97)}
+
+/* 折りたたみ */
+details.sec{background:var(--card);border-radius:14px;border:1px solid var(--line);margin-top:14px;overflow:hidden}
+details.sec>summary{list-style:none;cursor:pointer;padding:14px 16px;min-height:52px;font-weight:800;font-size:17px;display:flex;align-items:center;gap:8px}
+details.sec>summary::-webkit-details-marker{display:none}
+details.sec>summary::after{content:"＋";margin-left:auto;color:var(--theme);font-size:20px}
+details.sec[open]>summary::after{content:"－"}
+details.sec[open]>summary{border-bottom:1px solid var(--line)}
+.sec-body{padding:12px 16px 16px}
+.hint{font-size:13px;color:var(--sub);margin:4px 0 10px}
+
+/* 種類テーブル */
+.tbl{width:100%;border-collapse:collapse;font-size:14px}
+.tbl th{font-size:12px;color:var(--sub);text-align:left;font-weight:600;padding:4px 4px;border-bottom:1px solid var(--line)}
+.tbl td{padding:8px 4px;border-bottom:1px solid #f3f4f6;vertical-align:middle}
+.tbl td.nm{font-weight:700;word-break:break-all}
+.tbl td.nm small{display:block;font-weight:400;color:var(--sub);font-size:12px}
+.tbl td.c{text-align:center;white-space:nowrap}
+.tbl td.ops{white-space:nowrap;text-align:right}
+.tbl .btn{min-height:44px;font-size:13px;padding:4px 8px}
+.form{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:14px;padding:12px;background:#fdf2f8;border-radius:12px}
+.form h3{grid-column:1 / -1;margin:0;font-size:15px;color:var(--theme-d)}
+.form label{display:flex;flex-direction:column;font-size:13px;color:var(--sub);gap:4px}
+.form label.full{grid-column:1 / -1}
+.form input{min-height:44px;border:1px solid #d1d5db;border-radius:10px;padding:8px 10px;background:#fff;font-size:16px;width:100%}
+.form .err{grid-column:1 / -1;color:var(--red);font-size:13px;font-weight:700;min-height:0;margin:0}
+.form .row{grid-column:1 / -1;display:flex;gap:8px}
+.form .row .btn{flex:1}
+.set-row{display:flex;align-items:center;gap:10px;margin:8px 0 14px;flex-wrap:wrap}
+.set-row input[type=number]{width:90px;min-height:44px;border:1px solid #d1d5db;border-radius:10px;padding:8px 10px;font-size:18px;background:#fff}
+.stack{display:flex;flex-direction:column;gap:10px}
+.stack .btn{width:100%}
+textarea{width:100%;min-height:140px;border:1px solid #d1d5db;border-radius:10px;padding:8px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12px;background:#fff}
+.btn-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:8px}
+hr.sep{border:none;border-top:1px solid var(--line);margin:16px 0}
+
+/* ルール・履歴 */
+.rules{margin:0;padding-left:20px;font-size:14.5px}
+.rules li{margin-bottom:6px}
+.rules a{color:var(--theme-d);word-break:break-all}
+.log{list-style:none;margin:0;padding:0;font-size:14px}
+.log li{padding:6px 0;border-bottom:1px solid #f3f4f6;display:flex;gap:10px}
+.log .tm{color:var(--sub);flex:none;font-variant-numeric:tabular-nums}
+footer{text-align:center;font-size:12px;color:var(--sub);margin-top:24px}
+
+/* シート（追加モーダル） */
+.backdrop{position:fixed;inset:0;background:rgba(17,24,39,.45);z-index:50;display:none;align-items:flex-end;justify-content:center}
+.backdrop.open{display:flex}
+.sheet{background:#fff;width:100%;max-width:640px;max-height:86vh;border-radius:20px 20px 0 0;display:flex;flex-direction:column;
+  padding-bottom:env(safe-area-inset-bottom);animation:up .18s ease}
+@keyframes up{from{transform:translateY(30px);opacity:.5}to{transform:none;opacity:1}}
+.sheet-hd{display:flex;align-items:center;padding:12px 16px;border-bottom:1px solid var(--line)}
+.sheet-hd h2{margin:0;font-size:18px;flex:1}
+.sheet-hd .btn{min-width:48px}
+.sheet-warn{margin:10px 16px 0;padding:10px 12px;border-radius:10px;background:var(--red-l);color:var(--red);font-weight:700;font-size:14px}
+.sheet-list{overflow-y:auto;padding:12px 16px 16px;display:grid;gap:8px;-webkit-overflow-scrolling:touch}
+.pick{display:flex;align-items:center;gap:10px;width:100%;text-align:left;min-height:56px;border:2px solid var(--line);border-radius:12px;background:#fff;padding:8px 12px}
+.pick:active{transform:scale(.97);background:var(--theme-l)}
+.pick .pn{flex:1;font-weight:800;font-size:17px;word-break:break-all}
+.pick .pn small{display:block;font-weight:400;font-size:12px;color:var(--sub)}
+.pick .pm{flex:none;font-size:13px;color:var(--sub);text-align:right;white-space:nowrap}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom));transform:translateX(-50%);background:#111827;color:#fff;
+  padding:10px 16px;border-radius:999px;font-size:14px;z-index:60;opacity:0;pointer-events:none;transition:opacity .2s;max-width:90vw;text-align:center}
+.toast.show{opacity:.92}
+@media (max-width:400px){ .hd h1{font-size:16px} .c-btns .btn:not(.btn-use){font-size:14px;padding:6px 4px} }
+@media (min-width:600px){ .hd h1{font-size:21px} .c-name{font-size:24px} }
+</style>
+</head>
+<body>
+<header>
+  <div class="hd">
+    <h1>桃鉄 周遊カードカウンター</h1>
+    <span id="badge" class="badge">手持ち 0/8枚</span>
+  </div>
+</header>
+
+<div class="wrap">
+  <div id="hand"></div>
+  <button type="button" class="add-main" id="openAdd">＋ カードを追加</button>
+
+  <details class="sec" id="secTypes">
+    <summary>🗂 カード種類の管理</summary>
+    <div class="sec-body">
+      <p class="hint">「カードを追加」で選べるカードの一覧です。回数（最低〜最大）は自由に直せます。</p>
+      <table class="tbl">
+        <thead><tr><th>名前</th><th>🎲</th><th>回数</th><th></th></tr></thead>
+        <tbody id="typeRows"></tbody>
+      </table>
+      <form class="form" id="typeForm" autocomplete="off" novalidate>
+        <h3 id="formTitle">種類を追加</h3>
+        <label class="full">名前（必須）<input type="text" id="fName" maxlength="40" placeholder="例：急行周遊カード"></label>
+        <label class="full">備考（任意）<input type="text" id="fNote" maxlength="100" placeholder="例：回数は推定"></label>
+        <label>🎲個数（任意）<input type="number" id="fDice" inputmode="numeric" min="1" max="20" placeholder="なし"></label>
+        <label>最低回数<input type="number" id="fMin" inputmode="numeric" min="1" max="20" value="5"></label>
+        <label>最大回数<input type="number" id="fMax" inputmode="numeric" min="1" max="20" value="7"></label>
+        <p class="err" id="fErr"></p>
+        <div class="row">
+          <button type="submit" class="btn btn-primary" id="fSubmit">種類を追加</button>
+          <button type="button" class="btn btn-sub" id="fCancel" hidden>キャンセル</button>
+        </div>
+      </form>
+      <hr class="sep">
+      <button type="button" class="btn btn-sub" id="resetPreset" style="width:100%">プリセットに戻す</button>
+      <p class="hint">※ 手持ちのカードは残ります。</p>
+    </div>
+  </details>
+
+  <details class="sec" id="secSettings">
+    <summary>⚙️ 設定</summary>
+    <div class="sec-body">
+      <div class="set-row">
+        <label for="limitInput" style="font-weight:700">手持ち上限枚数</label>
+        <input type="number" id="limitInput" inputmode="numeric" min="1" max="30">
+        <span class="hint" style="margin:0">（既定 8枚）</span>
+      </div>
+      <div class="stack">
+        <button type="button" class="btn btn-sub" id="newGame">🚃 新しいゲームを始める（手持ちを全部クリア）</button>
+        <button type="button" class="btn btn-danger" id="wipeAll">全データ削除</button>
+      </div>
+      <hr class="sep">
+      <div style="font-weight:700">データの書き出し・読み込み</div>
+      <p class="hint">別の端末へ移すときに使います。「書き出す」→コピー→別の端末で貼り付けて「読み込む」。</p>
+      <textarea id="ioText" placeholder="ここにデータ(JSON)が表示されます／貼り付けます"></textarea>
+      <div class="btn-row">
+        <button type="button" class="btn btn-sub" id="exportBtn">書き出す</button>
+        <button type="button" class="btn btn-sub" id="copyBtn">コピー</button>
+        <button type="button" class="btn btn-primary" id="importBtn">読み込む</button>
+      </div>
+    </div>
+  </details>
+
+  <details class="sec">
+    <summary>📖 調べたルールメモ</summary>
+    <div class="sec-body">
+      <ul class="rules">
+        <li>手持ちカードの上限は<b>8枚</b>。9枚以上になると捨てる必要がある（8枚のときカードバンクマンが現れることがある）。</li>
+        <li>周遊系カードは1枚につき<b>5〜7回</b>使える（ぶっとび周遊は5〜9回）。<b>残り回数はゲーム内で見えない</b>。</li>
+        <li>回数を戻す方法：期間延長カード／周遊駅に止まる／ダビング駅で複製（複製は使用0回の新品）。</li>
+        <li>周遊禁止カードを使われると、周遊系が通常カードに格下げされる。</li>
+        <li>攻略サイトによっては「安全のため4回までに留める」と推奨している。</li>
+        <li>出典：<br>
+          <a href="https://gamepedia.jp/momotetsu2/card" target="_blank" rel="noopener noreferrer">桃鉄2 カード一覧（ゲームペディア）</a><br>
+          <a href="https://game8.jp/momotetsu-2/737476" target="_blank" rel="noopener noreferrer">Game8 桃鉄2 攻略</a>
+        </li>
+      </ul>
+      <p class="hint">※ 「回数は推定」と書いたカードは、はっきりした情報が見つからなかったものです。違っていたら「カード種類の管理」で直してください。</p>
+    </div>
+  </details>
+
+  <details class="sec">
+    <summary>🕘 操作履歴</summary>
+    <div class="sec-body">
+      <ul class="log" id="logList"></ul>
+    </div>
+  </details>
+
+  <footer>データはこの端末のブラウザの中だけに保存されます。</footer>
+</div>
+
+<div class="backdrop" id="addSheet" aria-hidden="true">
+  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle">
+    <div class="sheet-hd">
+      <h2 id="sheetTitle">どのカードを追加する？</h2>
+      <button type="button" class="btn btn-sub" id="closeAdd" aria-label="閉じる">✕</button>
+    </div>
+    <div class="sheet-warn" id="sheetWarn" hidden></div>
+    <div class="sheet-list" id="pickList"></div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+(function () {
+  'use strict';
+
+  var KEY = 'momotetsu_cards_v1';
+  var LOG_MAX = 50;
+  var DEFAULT_LIMIT = 8;
+  // [名前, サイコロ個数, 最低回数, 最大回数, 備考]
+  var PRESETS = [
+    ['急行周遊カード', 2, 5, 7, ''],
+    ['特急周遊カード', 3, 5, 7, ''],
+    ['新幹線周遊カード', 5, 5, 7, ''],
+    ['のぞみ周遊カード', 6, 5, 7, ''],
+    ['はやぶさ周遊カード', 7, 5, 7, '回数は推定'],
+    ['リニア周遊カード', 10, 5, 7, '回数は推定'],
+    ['ぶっとび周遊カード', null, 5, 9, 'ランダムな物件駅へ'],
+    ['☆飛び周遊カード', null, 5, 7, 'カード売り場へ・回数は推定'],
+    ['物件飛び周遊カード', null, 5, 7, '独占できる物件駅へ・回数は推定'],
+    ['強奪飛び周遊カード', null, 5, 7, '他社長の物件駅へ・回数は推定'],
+    ['乗っ取り周遊カード', null, 5, 7, '回数は推定']
+  ];
+
+  function $(id) { return document.getElementById(id); }
+  function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 6); }
+  function esc(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+  function toInt(v) {
+    if (v === null || v === undefined || v === '') return null;
+    var n = Number(v);
+    return (isFinite(n) && Math.floor(n) === n) ? n : null;
+  }
+  function presetTypes() {
+    var used = {};
+    return PRESETS.map(function (p) {
+      var id;
+      do { id = uid(); } while (used[id]);
+      used[id] = 1;
+      return { id: id, name: p[0], dice: p[1], min: p[2], max: p[3], note: p[4] };
+    });
+  }
+  function freshState() {
+    return { v: 1, limit: DEFAULT_LIMIT, types: presetTypes(), hand: [], log: [] };
+  }
+
+  // 読み込んだデータを安全な形にそろえる（壊れた値は捨てる）
+  function normalize(d) {
+    if (!d || typeof d !== 'object' || Array.isArray(d)) return null;
+    var out = { v: 1, limit: DEFAULT_LIMIT, types: [], hand: [], log: [] };
+    var lim = toInt(d.limit);
+    if (lim !== null && lim >= 1 && lim <= 30) out.limit = lim;
+    var seen = {};
+    if (Array.isArray(d.types)) {
+      d.types.forEach(function (t) {
+        if (!t || typeof t !== 'object') return;
+        var name = String(t.name == null ? '' : t.name).trim().slice(0, 40);
+        var mn = toInt(t.min), mx = toInt(t.max);
+        if (!name || mn === null || mx === null) return;
+        mn = Math.min(Math.max(mn, 1), 20);
+        mx = Math.min(Math.max(mx, mn), 20);
+        var dice = toInt(t.dice);
+        var id = String(t.id || '') || uid();
+        if (seen[id]) id = uid();
+        seen[id] = 1;
+        out.types.push({ id: id, name: name, dice: (dice !== null && dice >= 1 && dice <= 20) ? dice : null,
+          min: mn, max: mx, note: String(t.note == null ? '' : t.note).slice(0, 100) });
+      });
+    }
+    if (Array.isArray(d.hand)) {
+      d.hand.forEach(function (h) {
+        if (!h || typeof h !== 'object') return;
+        var u = toInt(h.used);
+        out.hand.push({ id: String(h.id || '') || uid(), typeId: String(h.typeId == null ? '' : h.typeId),
+          used: (u !== null && u > 0) ? Math.min(u, 99) : 0, addedAt: toInt(h.addedAt) || Date.now() });
+      });
+    }
+    if (Array.isArray(d.log)) {
+      d.log.forEach(function (l) {
+        if (l && typeof l === 'object' && l.text) out.log.push({ t: toInt(l.t) || 0, text: String(l.text).slice(0, 200) });
+      });
+      out.log = out.log.slice(0, LOG_MAX);
+    }
+    return out;
+  }
+
+  function load() {
+    var raw = null;
+    try { raw = localStorage.getItem(KEY); } catch (e) { raw = null; }
+    if (raw) {
+      try {
+        var d = normalize(JSON.parse(raw));
+        if (d) return d;
+      } catch (e) { /* 壊れている */ }
+      try { localStorage.setItem(KEY + '_broken_' + Date.now(), raw); } catch (e2) { /* 無視 */ }
+    }
+    return freshState();
+  }
+
+  var S = load();
+  var saveFailed = false;
+  function save() {
+    try { localStorage.setItem(KEY, JSON.stringify(S)); saveFailed = false; }
+    catch (e) { if (!saveFailed) toast('保存できませんでした（プライベートモード等では保存されません）'); saveFailed = true; }
+  }
+
+  function typeOf(id) {
+    for (var i = 0; i < S.types.length; i++) if (S.types[i].id === id) return S.types[i];
+    return null;
+  }
+  function typeOrFallback(id) {
+    return typeOf(id) || { id: '', name: '（種類が見つかりません）', dice: null, min: 5, max: 7, note: '' };
+  }
+  function shortName(name) { return String(name).replace(/カード$/, ''); }
+  function pad2(n) { return (n < 10 ? '0' : '') + n; }
+  function addLog(text) {
+    S.log.unshift({ t: Date.now(), text: text });
+    if (S.log.length > LOG_MAX) S.log.length = LOG_MAX;
+  }
+
+  var toastTimer = null;
+  function toast(msg) {
+    var el = $('toast');
+    el.textContent = msg;
+    el.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { el.classList.remove('show'); }, 2200);
+  }
+
+  // ---------- 描画 ----------
+  function renderBadge() {
+    var n = S.hand.length, lim = S.limit, b = $('badge');
+    b.className = 'badge';
+    if (n >= lim) { b.classList.add('full'); b.textContent = '上限！ ' + n + '/' + lim + '枚'; }
+    else { if (n === lim - 1) b.classList.add('warn'); b.textContent = '手持ち ' + n + '/' + lim + '枚'; }
+  }
+
+  function cardHtml(h, idx, sameIdx, sameTotal) {
+    var t = typeOrFallback(h.typeId);
+    var u = h.used, sure = t.min - u, most = t.max - u;
+    var st = u >= t.min ? 'red' : (u === t.min - 1 ? 'yellow' : 'green');
+    var stText = st === 'green' ? '安全圏' : (st === 'yellow' ? '次で危険域' : '危険域（消えるかも）');
+    var n = Math.max(t.max, u), dots = '';
+    for (var i = 0; i < n; i++) {
+      var c = 'dot';
+      if (i >= t.min) c += ' risk';
+      if (i < u) c += ' on';
+      if (i >= t.max) c += ' over';
+      dots += '<span class="' + c + '"></span>';
+    }
+    var sureHtml = sure > 0
+      ? '<div class="sure">確実にあと <b>' + sure + '</b>回</div>'
+      : '<div class="danger">⚠️いつ消えてもおかしくない</div>';
+    var mostHtml = most > 0
+      ? '<div class="most">最大あと <b>' + most + '</b>回</div>'
+      : '<div class="most">最大回数に到達</div>';
+    return '<div class="card st-' + st + '" data-id="' + esc(h.id) + '">' +
+      '<div class="c-top"><div class="c-name">' + esc(t.name) +
+        (sameTotal > 1 ? '<span class="num">#' + sameIdx + '</span>' : '') + '</div>' +
+        (t.dice ? '<span class="c-dice">🎲×' + esc(t.dice) + '</span>' : '') + '</div>' +
+      (t.note ? '<div class="c-note">' + esc(t.note) + '</div>' : '') +
+      '<span class="c-status">' + stText + '（' + t.min + '〜' + t.max + '回で消える）</span>' +
+      '<div class="c-mid"><div class="c-count"><span class="lbl">使った回数</span><span class="big">' + u + '<small>回</small></span></div>' +
+        '<div class="c-rest">' + sureHtml + mostHtml + '</div></div>' +
+      '<div class="dots" aria-hidden="true">' + dots + '</div>' +
+      '<div class="dots-legend">●使った　○確実に使える　◌点線＝消えるかも</div>' +
+      (u >= t.max ? '<p class="maxnote">使い切り(max)に到達。消えたら『捨てた/消えた』を押してね</p>' : '') +
+      '<div class="c-btns">' +
+        '<button type="button" class="btn btn-use" data-act="use" data-id="' + esc(h.id) + '">使った ＋1</button>' +
+        '<button type="button" class="btn" data-act="undo" data-id="' + esc(h.id) + '">戻す −1</button>' +
+        '<button type="button" class="btn btn-sub" data-act="reset" data-id="' + esc(h.id) + '">回数リセット</button>' +
+        '<button type="button" class="btn btn-danger" data-act="discard" data-id="' + esc(h.id) + '">捨てた/消えた</button>' +
+      '</div></div>';
+  }
+
+  function renderHand() {
+    var el = $('hand');
+    if (!S.hand.length) {
+      el.innerHTML = '<div class="empty">手持ちの周遊カードはまだありません。<br>カードを手に入れたら、下の <b>「＋ カードを追加」</b> を押してね。</div>';
+      return;
+    }
+    var totals = {}, counter = {};
+    S.hand.forEach(function (h) { totals[h.typeId] = (totals[h.typeId] || 0) + 1; });
+    el.innerHTML = S.hand.map(function (h, idx) {
+      counter[h.typeId] = (counter[h.typeId] || 0) + 1;
+      return cardHtml(h, idx, counter[h.typeId], totals[h.typeId]);
+    }).join('');
+  }
+
+  function renderTypes() {
+    var rows = S.types.map(function (t) {
+      return '<tr><td class="nm">' + esc(t.name) + (t.note ? '<small>' + esc(t.note) + '</small>' : '') + '</td>' +
+        '<td class="c">' + (t.dice ? esc(t.dice) : '−') + '</td>' +
+        '<td class="c">' + t.min + '〜' + t.max + '</td>' +
+        '<td class="ops"><button type="button" class="btn btn-sub" data-act="editType" data-id="' + esc(t.id) + '">編集</button> ' +
+        '<button type="button" class="btn btn-danger" data-act="delType" data-id="' + esc(t.id) + '">削除</button></td></tr>';
+    }).join('');
+    $('typeRows').innerHTML = rows || '<tr><td colspan="4" class="hint">種類がありません。下のフォームから追加するか「プリセットに戻す」を押してください。</td></tr>';
+  }
+
+  function renderLog() {
+    if (!S.log.length) { $('logList').innerHTML = '<li class="hint">まだ操作はありません。</li>'; return; }
+    $('logList').innerHTML = S.log.map(function (l) {
+      var d = new Date(l.t);
+      var tm = isNaN(d.getTime()) ? '--' : (d.getHours() + '時' + pad2(d.getMinutes()) + '分');
+      return '<li><span class="tm">' + tm + '</span><span>' + esc(l.text) + '</span></li>';
+    }).join('');
+  }
+
+  function renderPick() {
+    var full = S.hand.length >= S.limit;
+    var w = $('sheetWarn');
+    if (full) { w.hidden = false; w.textContent = '上限' + S.limit + '枚です。捨ててから追加してね（このまま追加もできます）'; }
+    else w.hidden = true;
+    $('pickList').innerHTML = S.types.length ? S.types.map(function (t) {
+      return '<button type="button" class="pick" data-act="pick" data-id="' + esc(t.id) + '">' +
+        '<span class="pn">' + esc(t.name) + (t.note ? '<small>' + esc(t.note) + '</small>' : '') + '</span>' +
+        '<span class="pm">' + (t.dice ? '🎲×' + esc(t.dice) + '<br>' : '') + t.min + '〜' + t.max + '回</span></button>';
+    }).join('') : '<p class="hint">カードの種類がありません。「カード種類の管理」で追加してください。</p>';
+  }
+
+  function renderAll() {
+    renderBadge(); renderHand(); renderTypes(); renderLog();
+    $('limitInput').value = S.limit;
+    if ($('addSheet').classList.contains('open')) renderPick();
+  }
+  function commit() { save(); renderAll(); }
+
+  // ---------- 手持ちカード操作 ----------
+  function findHand(id) {
+    for (var i = 0; i < S.hand.length; i++) if (S.hand[i].id === id) return i;
+    return -1;
+  }
+  function bump(id) {
+    var cards = document.querySelectorAll('.card');
+    for (var i = 0; i < cards.length; i++) {
+      if (cards[i].getAttribute('data-id') === id) { cards[i].classList.add('bump'); break; }
+    }
+  }
+
+  $('hand').addEventListener('click', function (e) {
+    var btn = e.target.closest('button[data-act]');
+    if (!btn) return;
+    var id = btn.getAttribute('data-id'), act = btn.getAttribute('data-act');
+    var i = findHand(id);
+    if (i < 0) return;
+    var h = S.hand[i], t = typeOrFallback(h.typeId), nm = shortName(t.name);
+    if (act === 'use') {
+      h.used += 1;
+      addLog(nm + ' +1 → ' + h.used + '回');
+      if (navigator.vibrate) { try { navigator.vibrate(15); } catch (e2) { /* 無視 */ } }
+      commit(); bump(id);
+      if (h.used === t.min) toast('ここから先はいつ消えてもおかしくないよ');
+    } else if (act === 'undo') {
+      if (h.used <= 0) { toast('もう0回です'); return; }
+      h.used -= 1;
+      addLog(nm + ' −1 → ' + h.used + '回');
+      commit();
+    } else if (act === 'reset') {
+      if (h.used === 0) { toast('もう0回です'); return; }
+      addLog(nm + ' 回数リセット（' + h.used + '回 → 0回）');
+      h.used = 0;
+      commit(); toast(nm + 'を0回に戻しました');
+    } else if (act === 'discard') {
+      if (!confirm('「' + t.name + '」（使った回数 ' + h.used + '回）を手持ちから外しますか？')) return;
+      S.hand.splice(i, 1);
+      addLog(nm + ' を捨てた/消えた（' + h.used + '回使用）');
+      commit();
+    }
+  });
+
+  // ---------- 追加シート ----------
+  var lastFocus = null;
+  function openSheet() {
+    lastFocus = document.activeElement;
+    renderPick();
+    var s = $('addSheet');
+    s.classList.add('open'); s.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeSheet() {
+    var s = $('addSheet');
+    s.classList.remove('open'); s.setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = '';
+    if (lastFocus && lastFocus.focus) { try { lastFocus.focus({ preventScroll: true }); } catch (e) { /* 無視 */ } }
+  }
+  $('openAdd').addEventListener('click', openSheet);
+  $('closeAdd').addEventListener('click', closeSheet);
+  $('addSheet').addEventListener('click', function (e) {
+    if (e.target === this) { closeSheet(); return; }
+    var btn = e.target.closest('button[data-act="pick"]');
+    if (!btn) return;
+    var t = typeOf(btn.getAttribute('data-id'));
+    if (!t) return;
+    var wasFull = S.hand.length >= S.limit;
+    var h = { id: uid(), typeId: t.id, used: 0, addedAt: Date.now() };
+    S.hand.push(h);
+    addLog(shortName(t.name) + ' を追加（手持ち ' + S.hand.length + '枚）');
+    commit();
+    closeSheet();
+    toast(wasFull || S.hand.length > S.limit ? '追加しました。上限を超えています。どれか捨ててね' : t.name + 'を追加しました');
+    bump(h.id);
+    var cards = document.querySelectorAll('.card');
+    if (cards.length) { try { cards[cards.length - 1].scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch (e2) { /* 無視 */ } }
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && $('addSheet').classList.contains('open')) closeSheet();
+  });
+
+  // ---------- カード種類の管理 ----------
+  var editingId = null;
+  function setForm(t) {
+    editingId = t ? t.id : null;
+    $('fName').value = t ? t.name : '';
+    $('fDice').value = t && t.dice ? t.dice : '';
+    $('fMin').value = t ? t.min : 5;
+    $('fMax').value = t ? t.max : 7;
+    $('fNote').value = t ? t.note : '';
+    $('fErr').textContent = '';
+    $('formTitle').textContent = t ? '「' + t.name + '」を編集' : '種類を追加';
+    $('fSubmit').textContent = t ? '更新する' : '種類を追加';
+    $('fCancel').hidden = !t;
+  }
+  $('fCancel').addEventListener('click', function () { setForm(null); });
+
+  $('typeRows').addEventListener('click', function (e) {
+    var btn = e.target.closest('button[data-act]');
+    if (!btn) return;
+    var t = typeOf(btn.getAttribute('data-id'));
+    if (!t) return;
+    if (btn.getAttribute('data-act') === 'editType') {
+      setForm(t);
+      try { $('typeForm').scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch (e2) { /* 無視 */ }
+      $('fName').focus({ preventScroll: true });
+    } else {
+      var inHand = S.hand.filter(function (h) { return h.typeId === t.id; }).length;
+      var msg = inHand
+        ? '「' + t.name + '」を削除します。\nこの種類の手持ちカード ' + inHand + '枚も一緒に消えます。よろしいですか？'
+        : '「' + t.name + '」を種類一覧から削除しますか？';
+      if (!confirm(msg)) return;
+      S.types = S.types.filter(function (x) { return x.id !== t.id; });
+      if (inHand) S.hand = S.hand.filter(function (h) { return h.typeId !== t.id; });
+      addLog('種類「' + shortName(t.name) + '」を削除' + (inHand ? '（手持ち' + inHand + '枚も削除）' : ''));
+      if (editingId === t.id) setForm(null);
+      commit();
+    }
+  });
+
+  $('typeForm').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var name = $('fName').value.trim();
+    var diceRaw = $('fDice').value.trim();
+    var mn = toInt($('fMin').value.trim()), mx = toInt($('fMax').value.trim());
+    var dice = diceRaw === '' ? null : toInt(diceRaw);
+    var note = $('fNote').value.trim();
+    var err = '';
+    if (!name) err = '名前を入れてください';
+    else if (name.length > 40) err = '名前は40文字までにしてください';
+    else if (diceRaw !== '' && (dice === null || dice < 1 || dice > 20)) err = 'サイコロ個数は1〜20の整数か、空欄にしてください';
+    else if (mn === null || mn < 1 || mn > 20) err = '最低回数は1〜20の整数にしてください';
+    else if (mx === null || mx < 1 || mx > 20) err = '最大回数は1〜20の整数にしてください';
+    else if (mn > mx) err = '最低回数は最大回数以下にしてください';
+    if (err) { $('fErr').textContent = err; return; }
+    if (editingId) {
+      var t = typeOf(editingId);
+      if (t) {
+        t.name = name; t.dice = dice; t.min = mn; t.max = mx; t.note = note.slice(0, 100);
+        addLog('種類「' + shortName(name) + '」を編集（' + mn + '〜' + mx + '回）');
+        toast('更新しました');
+      }
+    } else {
+      S.types.push({ id: uid(), name: name, dice: dice, min: mn, max: mx, note: note.slice(0, 100) });
+      addLog('種類「' + shortName(name) + '」を追加');
+      toast('種類を追加しました');
+    }
+    setForm(null);
+    commit();
+  });
+
+  $('resetPreset').addEventListener('click', function () {
+    if (!confirm('カードの種類をプリセット（最初の状態）に戻しますか？\n自分で追加・編集した種類は元に戻ります。手持ちのカードは残ります。')) return;
+    var oldTypes = S.types.slice();
+    var byName = {};
+    oldTypes.forEach(function (t) { if (!byName[t.name]) byName[t.name] = t; });
+    var next = presetTypes().map(function (p) {
+      var o = byName[p.name];
+      if (o) p.id = o.id; // 同じ名前なら同じIDを使い、手持ちとのつながりを保つ
+      return p;
+    });
+    var ids = {};
+    next.forEach(function (t) { ids[t.id] = 1; });
+    // 手持ちが参照しているのにプリセットに無い種類は残す
+    S.hand.forEach(function (h) {
+      if (ids[h.typeId]) return;
+      for (var i = 0; i < oldTypes.length; i++) {
+        if (oldTypes[i].id === h.typeId) { next.push(oldTypes[i]); ids[h.typeId] = 1; break; }
+      }
+    });
+    S.types = next;
+    setForm(null);
+    addLog('カードの種類をプリセットに戻した');
+    commit();
+    toast('プリセットに戻しました');
+  });
+
+  // ---------- 設定 ----------
+  $('limitInput').addEventListener('change', function () {
+    var n = toInt(this.value);
+    if (n === null || n < 1 || n > 30) { toast('上限は1〜30の整数にしてください'); this.value = S.limit; return; }
+    if (n === S.limit) return;
+    S.limit = n;
+    addLog('手持ち上限を' + n + '枚に変更');
+    commit();
+    toast('上限を' + n + '枚にしました');
+  });
+
+  $('newGame').addEventListener('click', function () {
+    if (!confirm('新しいゲームを始めます。\n手持ちのカードを全部クリアしますか？（カードの種類と設定は残ります）')) return;
+    S.hand = [];
+    addLog('新しいゲームを開始（手持ちをクリア）');
+    commit();
+    try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch (e) { window.scrollTo(0, 0); }
+    toast('手持ちをクリアしました');
+  });
+
+  $('wipeAll').addEventListener('click', function () {
+    if (!confirm('全データ（手持ち・カードの種類・設定・履歴）を削除して最初の状態に戻しますか？\nこの操作は取り消せません。')) return;
+    try { localStorage.removeItem(KEY); } catch (e) { /* 無視 */ }
+    S = freshState();
+    setForm(null);
+    $('ioText').value = '';
+    commit();
+    toast('全データを削除しました');
+  });
+
+  $('exportBtn').addEventListener('click', function () {
+    $('ioText').value = JSON.stringify(S, null, 2);
+    toast('書き出しました。「コピー」で写せます');
+  });
+  $('copyBtn').addEventListener('click', function () {
+    var ta = $('ioText');
+    if (!ta.value) ta.value = JSON.stringify(S, null, 2);
+    var done = function () { toast('コピーしました'); };
+    var fallback = function () {
+      ta.focus(); ta.select();
+      try { ta.setSelectionRange(0, ta.value.length); } catch (e) { /* 無視 */ }
+      var ok = false;
+      try { ok = document.execCommand('copy'); } catch (e) { ok = false; }
+      toast(ok ? 'コピーしました' : 'コピーできませんでした。手動で選択してコピーしてください');
+    };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(ta.value).then(done, fallback);
+    } else fallback();
+  });
+  $('importBtn').addEventListener('click', function () {
+    var txt = $('ioText').value.trim();
+    if (!txt) { toast('データを貼り付けてから押してください'); return; }
+    var d = null;
+    try { d = normalize(JSON.parse(txt)); } catch (e) { d = null; }
+    if (!d) { toast('読み込めませんでした。データの形が正しくありません'); return; }
+    if (!confirm('今のデータを、貼り付けたデータで置き換えますか？\n（手持ち ' + d.hand.length + '枚・種類 ' + d.types.length + '件）')) return;
+    S = d;
+    if (!S.types.length) S.types = presetTypes();
+    setForm(null);
+    addLog('データを読み込んだ');
+    commit();
+    toast('読み込みました');
+  });
+
+  // 別タブで変更されたら追従
+  window.addEventListener('storage', function (e) {
+    if (e.key !== KEY) return;
+    S = load();
+    renderAll();
+  });
+
+  save();
+  renderAll();
+})();
+</script>
+</body>
+</html>
