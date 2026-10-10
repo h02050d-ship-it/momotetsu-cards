@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-<!-- build:v1 -->
+<!-- build:v2 -->
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#db2777">
@@ -29,70 +29,65 @@ button,input,textarea,select{font:inherit;color:inherit}
 button{touch-action:manipulation;cursor:pointer;-webkit-tap-highlight-color:transparent}
 .wrap{max-width:640px;margin:0 auto;padding:0 16px 40px}
 
-/* ヘッダー */
-header{position:sticky;top:0;z-index:10;background:rgba(255,255,255,.96);border-bottom:2px solid var(--theme-l);
-  padding:10px 16px;padding-top:calc(10px + env(safe-area-inset-top))}
-.hd{max-width:640px;margin:0 auto;display:flex;align-items:center;gap:10px}
-.hd h1{margin:0;font-size:18px;line-height:1.3;color:var(--theme-d);flex:1;min-width:0}
-.badge{flex:none;border-radius:999px;padding:6px 12px;font-weight:700;font-size:15px;
+/* ヘッダー（1行・約44px） */
+header{position:sticky;top:0;z-index:10;background:rgba(255,255,255,.97);border-bottom:2px solid var(--theme-l);
+  padding:0 16px;padding-top:env(safe-area-inset-top)}
+.hd{max-width:640px;margin:0 auto;display:flex;align-items:center;gap:8px;height:44px}
+.hd h1{margin:0;font-size:16px;line-height:1.2;color:var(--theme-d);flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.badge{flex:none;border-radius:999px;padding:3px 10px;font-weight:700;font-size:14px;
   background:var(--theme-l);color:var(--theme-d);border:2px solid transparent;white-space:nowrap}
 .badge.warn{background:var(--yellow-l);color:#92400e;border-color:var(--yellow-b)}
 .badge.full{background:var(--red);color:#fff;border-color:var(--red)}
 
-/* 手持ちカード */
-#hand{display:flex;flex-direction:column;gap:14px;margin-top:16px}
-.empty{background:var(--card);border:2px dashed #f9a8d4;border-radius:16px;padding:24px 16px;text-align:center;color:var(--sub)}
+/* 手持ちカード（1枚＝コンパクトな1行） */
+#hand{display:flex;flex-direction:column;gap:5px;margin-top:8px}
+.empty{background:var(--card);border:2px dashed #f9a8d4;border-radius:14px;padding:20px 14px;text-align:center;color:var(--sub)}
 .empty b{color:var(--theme-d)}
-.card{background:var(--card);border-radius:18px;border:4px solid var(--green);padding:14px 14px 12px;
-  box-shadow:0 2px 8px rgba(0,0,0,.05)}
-.card.st-yellow{border-color:var(--yellow-b);background:linear-gradient(var(--yellow-l),#fff 60%)}
-.card.st-red{border-color:var(--red);background:linear-gradient(var(--red-l),#fff 60%)}
-.card.bump{animation:bump .25s ease}
-@keyframes bump{0%{transform:scale(1)}40%{transform:scale(.985)}100%{transform:scale(1)}}
-.c-top{display:flex;align-items:flex-start;gap:8px}
-.c-name{font-size:22px;font-weight:800;line-height:1.25;flex:1;min-width:0;word-break:break-all}
-.c-name .num{font-size:14px;color:var(--sub);font-weight:600;margin-left:4px}
-.c-dice{flex:none;font-size:17px;font-weight:700;background:#f3f4f6;border-radius:10px;padding:2px 8px;white-space:nowrap}
-.c-note{font-size:13px;color:var(--sub);margin-top:2px}
-.c-status{display:inline-block;font-size:13px;font-weight:700;border-radius:6px;padding:1px 8px;margin-top:6px;color:#fff;background:var(--green)}
-.st-yellow .c-status{background:var(--yellow)}
-.st-red .c-status{background:var(--red)}
-.c-mid{display:flex;align-items:center;gap:14px;margin-top:8px}
-.c-count{flex:none;text-align:center;min-width:92px}
-.c-count .lbl{font-size:13px;color:var(--sub);display:block}
-.c-count .big{font-size:52px;font-weight:900;line-height:1;color:var(--text)}
-.c-count .big small{font-size:18px;font-weight:700;margin-left:2px}
-.c-rest{flex:1;min-width:0;font-size:16px;line-height:1.6}
-.c-rest b{font-size:24px;font-weight:900}
-.c-rest .sure b{color:var(--green)}
-.st-yellow .c-rest .sure b{color:var(--yellow)}
-.c-rest .danger{color:var(--red);font-weight:800}
-.c-rest .most{color:var(--sub)}
-.dots{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0 2px}
-.dot{width:22px;height:22px;border-radius:50%;border:2px solid #9ca3af;background:#fff}
-.dot.risk{border-style:dashed;border-color:#f87171;background:#fff7f7}
+.card{display:flex;align-items:stretch;gap:6px;background:var(--card);border-radius:12px;border:3px solid var(--green);
+  padding:4px 4px 4px 8px;height:68px}
+.card.st-yellow{border-color:var(--yellow-b);background:var(--yellow-l)}
+.card.st-red{border-color:var(--red);background:var(--red-l)}
+.c-main{flex:1;min-width:0;display:flex;flex-direction:column;justify-content:space-between}
+.c-name{display:flex;align-items:baseline;gap:4px;min-width:0;line-height:1.2;padding-top:2px}
+.c-name .nm{font-size:15px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.c-name .num{flex:none;font-size:11px;color:var(--sub);font-weight:700}
+.c-name .dice{flex:none;font-size:12px;font-weight:700;color:#374151;white-space:nowrap}
+.c-row2{display:flex;align-items:center;gap:4px}
+.dots{display:flex;flex-wrap:wrap;gap:2px;flex:1;min-width:0;align-content:center}
+.dot{width:8px;height:8px;border-radius:50%;border:1.5px solid #9ca3af;background:#fff}
+.dot.risk{border-style:dashed;border-color:#f87171}
 .dot.on{background:var(--theme);border-color:var(--theme);border-style:solid}
 .dot.on.risk{background:var(--red);border-color:var(--red)}
 .dot.over{background:#7f1d1d;border-color:#7f1d1d}
-.dots-legend{font-size:11.5px;color:var(--sub)}
-.maxnote{margin:8px 0 0;font-size:13px;color:var(--red);font-weight:700}
-.c-btns{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:12px}
-.btn{min-height:48px;border-radius:12px;border:2px solid var(--line);background:#fff;font-weight:700;font-size:15px;padding:6px 8px;
+.sbtn{flex:none;width:36px;height:36px;border-radius:9px;border:1.5px solid var(--line);background:#fff;font-weight:800;font-size:15px;padding:0;
+  display:flex;align-items:center;justify-content:center;transition:transform .08s ease}
+.sbtn:active{transform:scale(.88)}
+.sbtn.del{color:var(--red);border-color:#fecaca}
+.c-count{flex:none;width:62px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
+.c-count .big{font-size:28px;font-weight:900;line-height:1;font-variant-numeric:tabular-nums}
+.c-count .big small{font-size:15px;font-weight:700;color:var(--sub)}
+.c-status{margin-top:4px;font-size:11px;font-weight:800;border-radius:5px;padding:1px 4px;color:#fff;background:var(--green);white-space:nowrap}
+.st-yellow .c-status{background:var(--yellow)}
+.st-red .c-status{background:var(--red)}
+.btn-use{flex:none;width:60px;border-radius:10px;border:none;background:var(--theme);color:#fff;font-size:22px;font-weight:900;
+  box-shadow:0 3px 0 var(--theme-d);transition:transform .08s ease;margin-bottom:3px}
+.btn-use:active{transform:scale(.92) translateY(2px);box-shadow:0 1px 0 var(--theme-d)}
+.add-main{display:block;width:100%;margin-top:8px;min-height:50px;font-size:18px;border-radius:14px;border:3px dashed var(--theme);
+  background:#fff;color:var(--theme-d);font-weight:900}
+.add-main:active{transform:scale(.97)}
+.legend{font-size:11.5px;color:var(--sub);margin:6px 2px 0}
+
+/* 汎用ボタン */
+.btn{min-height:44px;border-radius:12px;border:2px solid var(--line);background:#fff;font-weight:700;font-size:15px;padding:6px 8px;
   transition:transform .08s ease,background .15s}
-.btn:active{transform:scale(.93)}
-.btn-use{grid-column:1 / -1;min-height:72px;font-size:26px;font-weight:900;background:var(--theme);border-color:var(--theme);color:#fff;
-  box-shadow:0 4px 0 var(--theme-d)}
-.btn-use:active{transform:scale(.95) translateY(2px);box-shadow:0 2px 0 var(--theme-d)}
+.btn:active{transform:scale(.94)}
 .btn-danger{color:var(--red);border-color:#fecaca}
 .btn-primary{background:var(--theme);border-color:var(--theme);color:#fff}
 .btn-sub{background:#f9fafb}
-.add-main{display:block;width:100%;margin-top:16px;min-height:64px;font-size:20px;border-radius:16px;border:3px dashed var(--theme);
-  background:#fff;color:var(--theme-d);font-weight:900}
-.add-main:active{transform:scale(.97)}
 
 /* 折りたたみ */
-details.sec{background:var(--card);border-radius:14px;border:1px solid var(--line);margin-top:14px;overflow:hidden}
-details.sec>summary{list-style:none;cursor:pointer;padding:14px 16px;min-height:52px;font-weight:800;font-size:17px;display:flex;align-items:center;gap:8px}
+details.sec{background:var(--card);border-radius:14px;border:1px solid var(--line);margin-top:12px;overflow:hidden}
+details.sec>summary{list-style:none;cursor:pointer;padding:12px 16px;min-height:48px;font-weight:800;font-size:16px;display:flex;align-items:center;gap:8px}
 details.sec>summary::-webkit-details-marker{display:none}
 details.sec>summary::after{content:"＋";margin-left:auto;color:var(--theme);font-size:20px}
 details.sec[open]>summary::after{content:"－"}
@@ -114,7 +109,7 @@ details.sec[open]>summary{border-bottom:1px solid var(--line)}
 .form label{display:flex;flex-direction:column;font-size:13px;color:var(--sub);gap:4px}
 .form label.full{grid-column:1 / -1}
 .form input{min-height:44px;border:1px solid #d1d5db;border-radius:10px;padding:8px 10px;background:#fff;font-size:16px;width:100%}
-.form .err{grid-column:1 / -1;color:var(--red);font-size:13px;font-weight:700;min-height:0;margin:0}
+.form .err{grid-column:1 / -1;color:var(--red);font-size:13px;font-weight:700;margin:0}
 .form .row{grid-column:1 / -1;display:flex;gap:8px}
 .form .row .btn{flex:1}
 .set-row{display:flex;align-items:center;gap:10px;margin:8px 0 14px;flex-wrap:wrap}
@@ -129,12 +124,13 @@ hr.sep{border:none;border-top:1px solid var(--line);margin:16px 0}
 .rules{margin:0;padding-left:20px;font-size:14.5px}
 .rules li{margin-bottom:6px}
 .rules a{color:var(--theme-d);word-break:break-all}
+.myrule{background:var(--theme-l);border-radius:10px;padding:10px 12px;margin:0 0 12px;font-size:14.5px}
 .log{list-style:none;margin:0;padding:0;font-size:14px}
 .log li{padding:6px 0;border-bottom:1px solid #f3f4f6;display:flex;gap:10px}
 .log .tm{color:var(--sub);flex:none;font-variant-numeric:tabular-nums}
 footer{text-align:center;font-size:12px;color:var(--sub);margin-top:24px}
 
-/* シート（追加モーダル） */
+/* 追加シート */
 .backdrop{position:fixed;inset:0;background:rgba(17,24,39,.45);z-index:50;display:none;align-items:flex-end;justify-content:center}
 .backdrop.open{display:flex}
 .sheet{background:#fff;width:100%;max-width:640px;max-height:86vh;border-radius:20px 20px 0 0;display:flex;flex-direction:column;
@@ -153,8 +149,7 @@ footer{text-align:center;font-size:12px;color:var(--sub);margin-top:24px}
 .toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom));transform:translateX(-50%);background:#111827;color:#fff;
   padding:10px 16px;border-radius:999px;font-size:14px;z-index:60;opacity:0;pointer-events:none;transition:opacity .2s;max-width:90vw;text-align:center}
 .toast.show{opacity:.92}
-@media (max-width:400px){ .hd h1{font-size:16px} .c-btns .btn:not(.btn-use){font-size:14px;padding:6px 4px} }
-@media (min-width:600px){ .hd h1{font-size:21px} .c-name{font-size:24px} }
+@media (min-width:600px){ .hd h1{font-size:19px} .c-name .nm{font-size:17px} }
 </style>
 </head>
 <body>
@@ -168,22 +163,23 @@ footer{text-align:center;font-size:12px;color:var(--sub);margin-top:24px}
 <div class="wrap">
   <div id="hand"></div>
   <button type="button" class="add-main" id="openAdd">＋ カードを追加</button>
+  <p class="legend">数字は「使った回数／止める回数」。↺＝回数を0に戻す（期間延長カード・周遊駅のとき）、✕＝捨てた/消えた。</p>
 
   <details class="sec" id="secTypes">
     <summary>🗂 カード種類の管理</summary>
     <div class="sec-body">
-      <p class="hint">「カードを追加」で選べるカードの一覧です。回数（最低〜最大）は自由に直せます。</p>
+      <p class="hint">「カードを追加」で選べるカードの一覧です。「止める回数」は自分で使うのをやめる回数、「最大回数」はゲーム上の最大（参考）です。</p>
       <table class="tbl">
-        <thead><tr><th>名前</th><th>🎲</th><th>回数</th><th></th></tr></thead>
+        <thead><tr><th>名前</th><th>🎲</th><th>止める/最大</th><th></th></tr></thead>
         <tbody id="typeRows"></tbody>
       </table>
       <form class="form" id="typeForm" autocomplete="off" novalidate>
         <h3 id="formTitle">種類を追加</h3>
-        <label class="full">名前（必須）<input type="text" id="fName" maxlength="40" placeholder="例：急行周遊カード"></label>
+        <label class="full">名前（必須）<input type="text" id="fName" maxlength="40" placeholder="例：新幹線周遊カード"></label>
         <label class="full">備考（任意）<input type="text" id="fNote" maxlength="100" placeholder="例：回数は推定"></label>
         <label>🎲個数（任意）<input type="number" id="fDice" inputmode="numeric" min="1" max="20" placeholder="なし"></label>
-        <label>最低回数<input type="number" id="fMin" inputmode="numeric" min="1" max="20" value="5"></label>
-        <label>最大回数<input type="number" id="fMax" inputmode="numeric" min="1" max="20" value="7"></label>
+        <label>止める回数<input type="number" id="fStop" inputmode="numeric" min="1" max="20" value="4"></label>
+        <label>最大回数（任意）<input type="number" id="fMax" inputmode="numeric" min="1" max="20" value="7"></label>
         <p class="err" id="fErr"></p>
         <div class="row">
           <button type="submit" class="btn btn-primary" id="fSubmit">種類を追加</button>
@@ -223,9 +219,11 @@ footer{text-align:center;font-size:12px;color:var(--sub);margin-top:24px}
   <details class="sec">
     <summary>📖 調べたルールメモ</summary>
     <div class="sec-body">
+      <p class="myrule">🛑 <b>本人ルール：4回で止める。</b>周遊系は5回目で消えることがあるので、4回使ったら使うのをやめる。</p>
       <ul class="rules">
         <li>手持ちカードの上限は<b>8枚</b>。9枚以上になると捨てる必要がある（8枚のときカードバンクマンが現れることがある）。</li>
         <li>周遊系カードは1枚につき<b>5〜7回</b>使える（ぶっとび周遊は5〜9回）。<b>残り回数はゲーム内で見えない</b>。</li>
+        <li><b>スペシャルズカード</b>は5〜6回使える。1〜6の好きな数だけ進める周遊系カード。</li>
         <li>回数を戻す方法：期間延長カード／周遊駅に止まる／ダビング駅で複製（複製は使用0回の新品）。</li>
         <li>周遊禁止カードを使われると、周遊系が通常カードに格下げされる。</li>
         <li>攻略サイトによっては「安全のため4回までに留める」と推奨している。</li>
@@ -265,21 +263,19 @@ footer{text-align:center;font-size:12px;color:var(--sub);margin-top:24px}
   'use strict';
 
   var KEY = 'momotetsu_cards_v1';
+  var DATA_V = 2;
   var LOG_MAX = 50;
   var DEFAULT_LIMIT = 8;
-  // [名前, サイコロ個数, 最低回数, 最大回数, 備考]
+  var DEFAULT_STOP = 4;
+  // [名前, サイコロ個数, 止める回数, 最大回数, 備考]
   var PRESETS = [
-    ['急行周遊カード', 2, 5, 7, ''],
-    ['特急周遊カード', 3, 5, 7, ''],
-    ['新幹線周遊カード', 5, 5, 7, ''],
-    ['のぞみ周遊カード', 6, 5, 7, ''],
-    ['はやぶさ周遊カード', 7, 5, 7, '回数は推定'],
-    ['リニア周遊カード', 10, 5, 7, '回数は推定'],
-    ['ぶっとび周遊カード', null, 5, 9, 'ランダムな物件駅へ'],
-    ['☆飛び周遊カード', null, 5, 7, 'カード売り場へ・回数は推定'],
-    ['物件飛び周遊カード', null, 5, 7, '独占できる物件駅へ・回数は推定'],
-    ['強奪飛び周遊カード', null, 5, 7, '他社長の物件駅へ・回数は推定'],
-    ['乗っ取り周遊カード', null, 5, 7, '回数は推定']
+    ['スペシャルズカード', null, 4, 6, '1〜6の好きな数だけ進める（5〜6回）'],
+    ['新幹線周遊カード', 5, 4, 7, ''],
+    ['のぞみ周遊カード', 6, 4, 7, ''],
+    ['はやぶさ周遊カード', 7, 4, 7, '回数は推定'],
+    ['リニア周遊カード', 10, 4, 7, '回数は推定'],
+    ['☆飛び周遊カード', null, 4, 7, 'カード売り場へ・回数は推定'],
+    ['物件飛び周遊カード', null, 4, 7, '独占できる物件駅へ・回数は推定']
   ];
 
   function $(id) { return document.getElementById(id); }
@@ -294,23 +290,25 @@ footer{text-align:center;font-size:12px;color:var(--sub);margin-top:24px}
     var n = Number(v);
     return (isFinite(n) && Math.floor(n) === n) ? n : null;
   }
+  function clamp(n, lo, hi) { return Math.min(Math.max(n, lo), hi); }
   function presetTypes() {
     var used = {};
     return PRESETS.map(function (p) {
       var id;
       do { id = uid(); } while (used[id]);
       used[id] = 1;
-      return { id: id, name: p[0], dice: p[1], min: p[2], max: p[3], note: p[4] };
+      return { id: id, name: p[0], dice: p[1], stop: p[2], max: p[3], note: p[4] };
     });
   }
   function freshState() {
-    return { v: 1, limit: DEFAULT_LIMIT, types: presetTypes(), hand: [], log: [] };
+    return { v: DATA_V, limit: DEFAULT_LIMIT, types: presetTypes(), hand: [], log: [] };
   }
 
-  // 読み込んだデータを安全な形にそろえる（壊れた値は捨てる）
+  // 読み込んだデータを安全な形にそろえる（v1→v2 の変換もここ）
   function normalize(d) {
     if (!d || typeof d !== 'object' || Array.isArray(d)) return null;
-    var out = { v: 1, limit: DEFAULT_LIMIT, types: [], hand: [], log: [] };
+    var oldVer = toInt(d.v) || 1;
+    var out = { v: DATA_V, limit: DEFAULT_LIMIT, types: [], hand: [], log: [] };
     var lim = toInt(d.limit);
     if (lim !== null && lim >= 1 && lim <= 30) out.limit = lim;
     var seen = {};
@@ -318,16 +316,21 @@ footer{text-align:center;font-size:12px;color:var(--sub);margin-top:24px}
       d.types.forEach(function (t) {
         if (!t || typeof t !== 'object') return;
         var name = String(t.name == null ? '' : t.name).trim().slice(0, 40);
-        var mn = toInt(t.min), mx = toInt(t.max);
-        if (!name || mn === null || mx === null) return;
-        mn = Math.min(Math.max(mn, 1), 20);
-        mx = Math.min(Math.max(mx, mn), 20);
+        if (!name) return;
+        var stop = toInt(t.stop);
+        if (stop === null) {
+          var mn = toInt(t.min);
+          stop = mn !== null ? mn - 1 : DEFAULT_STOP;
+        }
+        stop = clamp(stop, 1, 20);
+        var mx = toInt(t.max);
+        mx = (mx !== null && mx >= 1) ? clamp(Math.max(mx, stop), 1, 20) : null;
         var dice = toInt(t.dice);
         var id = String(t.id || '') || uid();
         if (seen[id]) id = uid();
         seen[id] = 1;
         out.types.push({ id: id, name: name, dice: (dice !== null && dice >= 1 && dice <= 20) ? dice : null,
-          min: mn, max: mx, note: String(t.note == null ? '' : t.note).slice(0, 100) });
+          stop: stop, max: mx, note: String(t.note == null ? '' : t.note).slice(0, 100) });
       });
     }
     if (Array.isArray(d.hand)) {
@@ -344,6 +347,8 @@ footer{text-align:center;font-size:12px;color:var(--sub);margin-top:24px}
       });
       out.log = out.log.slice(0, LOG_MAX);
     }
+    // 旧v1データ：手持ちが0枚なら種類を新プリセットに丸ごと差し替え
+    if (oldVer < 2 && out.hand.length === 0) out.types = presetTypes();
     return out;
   }
 
@@ -372,13 +377,18 @@ footer{text-align:center;font-size:12px;color:var(--sub);margin-top:24px}
     return null;
   }
   function typeOrFallback(id) {
-    return typeOf(id) || { id: '', name: '（種類が見つかりません）', dice: null, min: 5, max: 7, note: '' };
+    return typeOf(id) || { id: '', name: '（種類が見つかりません）', dice: null, stop: DEFAULT_STOP, max: null, note: '' };
   }
   function shortName(name) { return String(name).replace(/カード$/, ''); }
   function pad2(n) { return (n < 10 ? '0' : '') + n; }
   function addLog(text) {
     S.log.unshift({ t: Date.now(), text: text });
     if (S.log.length > LOG_MAX) S.log.length = LOG_MAX;
+  }
+  function stateOf(u, t) {
+    if (u >= t.stop) return { cls: 'red', label: 'ストップ！', long: 'ストップ！次は消えるかも' };
+    if (u === t.stop - 1) return { cls: 'yellow', label: '次が最後', long: '次が最後' };
+    return { cls: 'green', label: 'あと' + (t.stop - u) + '回', long: 'あと' + (t.stop - u) + '回' };
   }
 
   var toastTimer = null;
@@ -398,42 +408,34 @@ footer{text-align:center;font-size:12px;color:var(--sub);margin-top:24px}
     else { if (n === lim - 1) b.classList.add('warn'); b.textContent = '手持ち ' + n + '/' + lim + '枚'; }
   }
 
-  function cardHtml(h, idx, sameIdx, sameTotal) {
+  function cardHtml(h, sameIdx, sameTotal) {
     var t = typeOrFallback(h.typeId);
-    var u = h.used, sure = t.min - u, most = t.max - u;
-    var st = u >= t.min ? 'red' : (u === t.min - 1 ? 'yellow' : 'green');
-    var stText = st === 'green' ? '安全圏' : (st === 'yellow' ? '次で危険域' : '危険域（消えるかも）');
-    var n = Math.max(t.max, u), dots = '';
+    var u = h.used, st = stateOf(u, t);
+    var n = Math.max(t.max || t.stop, t.stop, u), dots = '';
     for (var i = 0; i < n; i++) {
       var c = 'dot';
-      if (i >= t.min) c += ' risk';
+      if (i >= t.stop) c += ' risk';
       if (i < u) c += ' on';
-      if (i >= t.max) c += ' over';
+      if (t.max && i >= t.max) c += ' over';
       dots += '<span class="' + c + '"></span>';
     }
-    var sureHtml = sure > 0
-      ? '<div class="sure">確実にあと <b>' + sure + '</b>回</div>'
-      : '<div class="danger">⚠️いつ消えてもおかしくない</div>';
-    var mostHtml = most > 0
-      ? '<div class="most">最大あと <b>' + most + '</b>回</div>'
-      : '<div class="most">最大回数に到達</div>';
-    return '<div class="card st-' + st + '" data-id="' + esc(h.id) + '">' +
-      '<div class="c-top"><div class="c-name">' + esc(t.name) +
-        (sameTotal > 1 ? '<span class="num">#' + sameIdx + '</span>' : '') + '</div>' +
-        (t.dice ? '<span class="c-dice">🎲×' + esc(t.dice) + '</span>' : '') + '</div>' +
-      (t.note ? '<div class="c-note">' + esc(t.note) + '</div>' : '') +
-      '<span class="c-status">' + stText + '（' + t.min + '〜' + t.max + '回で消える）</span>' +
-      '<div class="c-mid"><div class="c-count"><span class="lbl">使った回数</span><span class="big">' + u + '<small>回</small></span></div>' +
-        '<div class="c-rest">' + sureHtml + mostHtml + '</div></div>' +
-      '<div class="dots" aria-hidden="true">' + dots + '</div>' +
-      '<div class="dots-legend">●使った　○確実に使える　◌点線＝消えるかも</div>' +
-      (u >= t.max ? '<p class="maxnote">使い切り(max)に到達。消えたら『捨てた/消えた』を押してね</p>' : '') +
-      '<div class="c-btns">' +
-        '<button type="button" class="btn btn-use" data-act="use" data-id="' + esc(h.id) + '">使った ＋1</button>' +
-        '<button type="button" class="btn" data-act="undo" data-id="' + esc(h.id) + '">戻す −1</button>' +
-        '<button type="button" class="btn btn-sub" data-act="reset" data-id="' + esc(h.id) + '">回数リセット</button>' +
-        '<button type="button" class="btn btn-danger" data-act="discard" data-id="' + esc(h.id) + '">捨てた/消えた</button>' +
-      '</div></div>';
+    var id = esc(h.id), nm = shortName(t.name);
+    var info = nm + '：' + u + '回使用・止める回数' + t.stop + '回' + (t.max ? '・最大' + t.max + '回' : '') + '。' + st.long;
+    return '<div class="card st-' + st.cls + '" data-id="' + id + '" title="' + esc(info) + '">' +
+      '<div class="c-main">' +
+        '<div class="c-name"><span class="nm">' + esc(nm) + '</span>' +
+          (sameTotal > 1 ? '<span class="num">#' + sameIdx + '</span>' : '') +
+          (t.dice ? '<span class="dice">🎲×' + esc(t.dice) + '</span>' : '') + '</div>' +
+        '<div class="c-row2"><div class="dots" aria-hidden="true">' + dots + '</div>' +
+          '<button type="button" class="sbtn" data-act="undo" data-id="' + id + '" aria-label="戻す −1">−1</button>' +
+          '<button type="button" class="sbtn" data-act="reset" data-id="' + id + '" aria-label="回数リセット">↺</button>' +
+          '<button type="button" class="sbtn del" data-act="discard" data-id="' + id + '" aria-label="捨てた/消えた">✕</button>' +
+        '</div>' +
+      '</div>' +
+      '<div class="c-count" aria-label="' + esc(info) + '"><span class="big">' + u + '<small>/' + t.stop + '</small></span>' +
+        '<span class="c-status">' + st.label + '</span></div>' +
+      '<button type="button" class="btn-use" data-act="use" data-id="' + id + '" aria-label="使った +1">＋1</button>' +
+      '</div>';
   }
 
   function renderHand() {
@@ -444,9 +446,9 @@ footer{text-align:center;font-size:12px;color:var(--sub);margin-top:24px}
     }
     var totals = {}, counter = {};
     S.hand.forEach(function (h) { totals[h.typeId] = (totals[h.typeId] || 0) + 1; });
-    el.innerHTML = S.hand.map(function (h, idx) {
+    el.innerHTML = S.hand.map(function (h) {
       counter[h.typeId] = (counter[h.typeId] || 0) + 1;
-      return cardHtml(h, idx, counter[h.typeId], totals[h.typeId]);
+      return cardHtml(h, counter[h.typeId], totals[h.typeId]);
     }).join('');
   }
 
@@ -454,7 +456,7 @@ footer{text-align:center;font-size:12px;color:var(--sub);margin-top:24px}
     var rows = S.types.map(function (t) {
       return '<tr><td class="nm">' + esc(t.name) + (t.note ? '<small>' + esc(t.note) + '</small>' : '') + '</td>' +
         '<td class="c">' + (t.dice ? esc(t.dice) : '−') + '</td>' +
-        '<td class="c">' + t.min + '〜' + t.max + '</td>' +
+        '<td class="c">' + t.stop + ' / ' + (t.max ? t.max : '−') + '</td>' +
         '<td class="ops"><button type="button" class="btn btn-sub" data-act="editType" data-id="' + esc(t.id) + '">編集</button> ' +
         '<button type="button" class="btn btn-danger" data-act="delType" data-id="' + esc(t.id) + '">削除</button></td></tr>';
     }).join('');
@@ -478,7 +480,7 @@ footer{text-align:center;font-size:12px;color:var(--sub);margin-top:24px}
     $('pickList').innerHTML = S.types.length ? S.types.map(function (t) {
       return '<button type="button" class="pick" data-act="pick" data-id="' + esc(t.id) + '">' +
         '<span class="pn">' + esc(t.name) + (t.note ? '<small>' + esc(t.note) + '</small>' : '') + '</span>' +
-        '<span class="pm">' + (t.dice ? '🎲×' + esc(t.dice) + '<br>' : '') + t.min + '〜' + t.max + '回</span></button>';
+        '<span class="pm">' + (t.dice ? '🎲×' + esc(t.dice) + '<br>' : '') + t.stop + '回で止める</span></button>';
     }).join('') : '<p class="hint">カードの種類がありません。「カード種類の管理」で追加してください。</p>';
   }
 
@@ -494,12 +496,6 @@ footer{text-align:center;font-size:12px;color:var(--sub);margin-top:24px}
     for (var i = 0; i < S.hand.length; i++) if (S.hand[i].id === id) return i;
     return -1;
   }
-  function bump(id) {
-    var cards = document.querySelectorAll('.card');
-    for (var i = 0; i < cards.length; i++) {
-      if (cards[i].getAttribute('data-id') === id) { cards[i].classList.add('bump'); break; }
-    }
-  }
 
   $('hand').addEventListener('click', function (e) {
     var btn = e.target.closest('button[data-act]');
@@ -510,14 +506,16 @@ footer{text-align:center;font-size:12px;color:var(--sub);margin-top:24px}
     var h = S.hand[i], t = typeOrFallback(h.typeId), nm = shortName(t.name);
     if (act === 'use') {
       h.used += 1;
-      addLog(nm + ' +1 → ' + h.used + '回');
+      addLog(nm + ' +1 → ' + h.used + '/' + t.stop + '回');
       if (navigator.vibrate) { try { navigator.vibrate(15); } catch (e2) { /* 無視 */ } }
-      commit(); bump(id);
-      if (h.used === t.min) toast('ここから先はいつ消えてもおかしくないよ');
+      commit();
+      if (h.used === t.stop) toast(nm + '：ストップ！次は消えるかも');
+      else if (h.used === t.stop - 1) toast(nm + '：次が最後');
+      else if (t.max && h.used === t.max) toast(nm + '：最大回数に到達。消えたら✕を押してね');
     } else if (act === 'undo') {
       if (h.used <= 0) { toast('もう0回です'); return; }
       h.used -= 1;
-      addLog(nm + ' −1 → ' + h.used + '回');
+      addLog(nm + ' −1 → ' + h.used + '/' + t.stop + '回');
       commit();
     } else if (act === 'reset') {
       if (h.used === 0) { toast('もう0回です'); return; }
@@ -556,15 +554,11 @@ footer{text-align:center;font-size:12px;color:var(--sub);margin-top:24px}
     var t = typeOf(btn.getAttribute('data-id'));
     if (!t) return;
     var wasFull = S.hand.length >= S.limit;
-    var h = { id: uid(), typeId: t.id, used: 0, addedAt: Date.now() };
-    S.hand.push(h);
+    S.hand.push({ id: uid(), typeId: t.id, used: 0, addedAt: Date.now() });
     addLog(shortName(t.name) + ' を追加（手持ち ' + S.hand.length + '枚）');
     commit();
     closeSheet();
-    toast(wasFull || S.hand.length > S.limit ? '追加しました。上限を超えています。どれか捨ててね' : t.name + 'を追加しました');
-    bump(h.id);
-    var cards = document.querySelectorAll('.card');
-    if (cards.length) { try { cards[cards.length - 1].scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch (e2) { /* 無視 */ } }
+    toast(wasFull ? '追加しました。上限を超えています。どれか捨ててね' : shortName(t.name) + 'を追加しました');
   });
   document.addEventListener('keydown', function (e) {
     if (e.key === 'Escape' && $('addSheet').classList.contains('open')) closeSheet();
@@ -576,8 +570,8 @@ footer{text-align:center;font-size:12px;color:var(--sub);margin-top:24px}
     editingId = t ? t.id : null;
     $('fName').value = t ? t.name : '';
     $('fDice').value = t && t.dice ? t.dice : '';
-    $('fMin').value = t ? t.min : 5;
-    $('fMax').value = t ? t.max : 7;
+    $('fStop').value = t ? t.stop : DEFAULT_STOP;
+    $('fMax').value = t ? (t.max || '') : 7;
     $('fNote').value = t ? t.note : '';
     $('fErr').textContent = '';
     $('formTitle').textContent = t ? '「' + t.name + '」を編集' : '種類を追加';
@@ -612,27 +606,28 @@ footer{text-align:center;font-size:12px;color:var(--sub);margin-top:24px}
   $('typeForm').addEventListener('submit', function (e) {
     e.preventDefault();
     var name = $('fName').value.trim();
-    var diceRaw = $('fDice').value.trim();
-    var mn = toInt($('fMin').value.trim()), mx = toInt($('fMax').value.trim());
+    var diceRaw = $('fDice').value.trim(), maxRaw = $('fMax').value.trim();
+    var stop = toInt($('fStop').value.trim());
     var dice = diceRaw === '' ? null : toInt(diceRaw);
+    var mx = maxRaw === '' ? null : toInt(maxRaw);
     var note = $('fNote').value.trim();
     var err = '';
     if (!name) err = '名前を入れてください';
     else if (name.length > 40) err = '名前は40文字までにしてください';
     else if (diceRaw !== '' && (dice === null || dice < 1 || dice > 20)) err = 'サイコロ個数は1〜20の整数か、空欄にしてください';
-    else if (mn === null || mn < 1 || mn > 20) err = '最低回数は1〜20の整数にしてください';
-    else if (mx === null || mx < 1 || mx > 20) err = '最大回数は1〜20の整数にしてください';
-    else if (mn > mx) err = '最低回数は最大回数以下にしてください';
+    else if (stop === null || stop < 1 || stop > 20) err = '止める回数は1〜20の整数にしてください';
+    else if (maxRaw !== '' && (mx === null || mx < 1 || mx > 20)) err = '最大回数は1〜20の整数か、空欄にしてください';
+    else if (mx !== null && stop > mx) err = '止める回数は最大回数以下にしてください';
     if (err) { $('fErr').textContent = err; return; }
     if (editingId) {
       var t = typeOf(editingId);
       if (t) {
-        t.name = name; t.dice = dice; t.min = mn; t.max = mx; t.note = note.slice(0, 100);
-        addLog('種類「' + shortName(name) + '」を編集（' + mn + '〜' + mx + '回）');
+        t.name = name; t.dice = dice; t.stop = stop; t.max = mx; t.note = note.slice(0, 100);
+        addLog('種類「' + shortName(name) + '」を編集（' + stop + '回で止める）');
         toast('更新しました');
       }
     } else {
-      S.types.push({ id: uid(), name: name, dice: dice, min: mn, max: mx, note: note.slice(0, 100) });
+      S.types.push({ id: uid(), name: name, dice: dice, stop: stop, max: mx, note: note.slice(0, 100) });
       addLog('種類「' + shortName(name) + '」を追加');
       toast('種類を追加しました');
     }
